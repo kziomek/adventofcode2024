@@ -1,7 +1,6 @@
 import advent.day1.MergeSort
 import spock.lang.Specification
 
-
 class MergeSortSpec extends Specification {
 
     def "null arr"() {

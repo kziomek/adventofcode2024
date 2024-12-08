@@ -3,17 +3,16 @@ package advent.day1;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class HistorianHysteria {
     public static void main(String[] args) throws IOException {
-//        List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/example.txt"))
-                    List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/my-input.txt"))
+        //        List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/example.txt"))
+        List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/my-input.txt"))
             .stream()
-            .map(el -> el.split("   "))
+            .map(el -> el.split(" {3}"))
             .toList();
 
         int[] arrA = new int[list.size()];
@@ -39,8 +38,7 @@ public class HistorianHysteria {
         // part 2
         Map<Integer, Integer> counterMap = toNumberCount(arrB);
         int resultPart2 = 0;
-        for (int i = 0; i < arrA.length; i++) {
-            int num = arrA[i];
+        for (int num : arrA) {
             int multiplier = counterMap.getOrDefault(num, 0);
             resultPart2 += num * multiplier;
         }
@@ -59,9 +57,4 @@ public class HistorianHysteria {
         return counterMap;
     }
 
-    private static void printArr(int[] arr) {
-        for (int i : arr) {
-            System.out.println(i);
-        }
-    }
 }

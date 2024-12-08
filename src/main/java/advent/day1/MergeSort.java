@@ -25,38 +25,27 @@ public class MergeSort {
         int[] a1 = new int[m - l + 1];
         int[] a2 = new int[r - m];
 
-        for (int i = 0; i < m - l + 1; i++) {
-            a1[i] = arr[l + i];
-        }
-        for (int i = 0; i < r - m; i++) {
-            a2[i] = arr[m + 1 + i];
-        }
-        System.out.println();
+        System.arraycopy(arr, l, a1, 0, m - l + 1);
+        System.arraycopy(arr, m + 1, a2, 0, r - m);
 
-        int i = 0, j = 0;
+        int i = 0, // index of a1
+            j = 0; // index of a2
+        int k = l; // index of arr
 
-        int pos = l;
         while (i < a1.length && j < a2.length) {
             if (a1[i] < a2[j]) {
-                arr[pos] = a1[i];
-                i++;
+                arr[k++] = a1[i++];
             } else {
-                arr[pos] = a2[j];
-                j++;
+                arr[k++] = a2[j++];
             }
-            pos++;
         }
 
         while (i < a1.length) {
-            arr[pos] = a1[i];
-            i++;
-            pos++;
+            arr[k++] = a1[i++];
         }
 
         while (j < a2.length) {
-            arr[pos] = a2[j];
-            j++;
-            pos++;
+            arr[k++] = a2[j++];
         }
     }
 }
