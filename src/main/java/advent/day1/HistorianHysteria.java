@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class HistorianHysteria {
     public static void main(String[] args) throws IOException {
-        //        List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/example.txt"))
-        List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/my-input.txt"))
+//        List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/example.txt"))
+                    List<String[]> list = Files.readAllLines(Path.of("src/main/resources/day1/my-input.txt"))
             .stream()
             .map(el -> el.split("   "))
             .toList();
@@ -25,8 +25,11 @@ public class HistorianHysteria {
         }
 
         // part1
-        Arrays.sort(arrA);
-        Arrays.sort(arrB);
+        //        Arrays.sort(arrA);
+        //        Arrays.sort(arrB);
+        new MergeSort().sort(arrA);
+        new MergeSort().sort(arrB);
+
         int resultPart1 = 0;
         for (int i = 0; i < arrA.length; i++) {
             resultPart1 += Math.abs(arrA[i] - arrB[i]);
