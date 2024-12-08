@@ -3,6 +3,9 @@ package advent.day1;
 public class MergeSort {
 
     public void sort(int[] arr) {
+        if (arr == null || arr.length == 1) {
+            return;
+        }
         sort(arr, 0, arr.length - 1);
     }
 
@@ -15,7 +18,6 @@ public class MergeSort {
 
         sort(arr, l, m);
         sort(arr, m + 1, r);
-
         merge(arr, l, m, r);
     }
 
