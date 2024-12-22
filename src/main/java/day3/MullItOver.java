@@ -14,28 +14,54 @@ public class MullItOver {
         //        System.out.println(lines.size());
 
         //        List<String> lines =List.of("xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))");
+        //        List<String> lines = List.of("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))");
+        String line = String.join("", lines);
 
-        int total = 0;
-
-        for (String line : lines) {
-            total += scan(line);
-        }
-
+        int total = scan(line);
         System.out.println("Result " + total);
     }
 
     private static int scan(String line) {
         int total = 0;
         int i = 0;
+        Boolean enabled = Boolean.TRUE;
         while (i < line.length()) {
             if (line.charAt(i) == 'm') {
-
                 int result = parseMulAt(line, i);
-                total += result;
+                if (enabled.equals(Boolean.TRUE)) {
+                    total += result;
+                }
+            }
+            if (line.charAt(i) == 'd') {
+                Boolean enabledResult = parseD(line, i);
+                if (enabledResult != null) {
+                    enabled = enabledResult;
+                }
             }
             i++;
         }
         return total;
+    }
+
+    private static Boolean parseD(String line, int i) {
+        if (line.charAt(i) == 'd'
+            && line.charAt(i + 1) == 'o'
+            && line.charAt(i + 2) == 'n'
+            && line.charAt(i + 3) == '\''
+            && line.charAt(i + 4) == 't'
+            && line.charAt(i + 5) == '('
+            && line.charAt(i + 6) == ')') {
+            System.out.println("don't");
+            return Boolean.FALSE;
+        }
+        if (line.charAt(i) == 'd'
+            && line.charAt(i + 1) == 'o'
+            && line.charAt(i + 2) == '('
+            && line.charAt(i + 3) == ')') {
+            System.out.println("do");
+            return Boolean.TRUE;
+        }
+        return null;
     }
 
     private static int parseMulAt(String line, int i) {
