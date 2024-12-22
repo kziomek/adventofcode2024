@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class RedNosedReports {
 
@@ -30,32 +29,80 @@ public class RedNosedReports {
     }
 
     private static boolean isReportSafe(Integer[] report) {
-        int badLevelCount = 0;
+        return testDesc(report)
+            || testDescReverse(report)
+            || testAsc(report)
+            || testAscReverse(report);
+    }
+
+    private static boolean testDescReverse(Integer[] report) {
         int badLevelCountReverse = 0;
-
-        int i = 0, j = 1;
-
-        while (j <= report.length - 1) {
-            int difference = report[i] - report[j];
-            if (difference < 1 || difference > 3) {
-                badLevelCount++;
-            }
-            i = j;
-            j++;
-        }
-
+        int i;
+        int j;
         i = report.length - 1;
         j = i - 1;
         while (j >= 0) {
             int difference = report[i] - report[j];
             if (difference < 1 || difference > 3) {
                 badLevelCountReverse++;
+                j--;
+                continue;
             }
             i = j;
             j--;
         }
+        return badLevelCountReverse <= 1;
+    }
 
-        return badLevelCount == 0 || badLevelCountReverse == 0;
+    private static boolean testDesc(Integer[] report) {
+        int badLevelCount = 0;
+        int i = 0, j = 1;
+        while (j <= report.length - 1) {
+            int difference = report[i] - report[j];
+            if (difference < 1 || difference > 3) {
+                badLevelCount++;
+                j++;
+                continue;
+            }
+            i = j;
+            j++;
+        }
+        return badLevelCount <= 1;
+    }
+
+    private static boolean testAsc(Integer[] report) {
+        int badLevelCount = 0;
+        int i = 0, j = 1;
+        while (j <= report.length - 1) {
+            int difference = report[i] - report[j];
+            if (difference < -3 || difference > -1) {
+                badLevelCount++;
+                j++;
+                continue;
+            }
+            i = j;
+            j++;
+        }
+        return badLevelCount <= 1;
+    }
+
+    private static boolean testAscReverse(Integer[] report) {
+        int badLevelCountReverse = 0;
+        int i;
+        int j;
+        i = report.length - 1;
+        j = i - 1;
+        while (j >= 0) {
+            int difference = report[i] - report[j];
+            if (difference < -3 || difference > -1) {
+                badLevelCountReverse++;
+                j--;
+                continue;
+            }
+            i = j;
+            j--;
+        }
+        return badLevelCountReverse <= 1;
     }
 
     public static void print(Integer[] report) {
