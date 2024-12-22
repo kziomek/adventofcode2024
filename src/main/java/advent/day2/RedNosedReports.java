@@ -30,26 +30,32 @@ public class RedNosedReports {
     }
 
     private static boolean isReportSafe(Integer[] report) {
-        boolean flag1 = true;
-        boolean flag2 = true;
-        for (int i = 0; i < report.length - 1; i++) {
-            int difference = report[i] - report[i + 1];
+        int badLevelCount = 0;
+        int badLevelCountReverse = 0;
+
+        int i = 0, j = 1;
+
+        while (j <= report.length - 1) {
+            int difference = report[i] - report[j];
             if (difference < 1 || difference > 3) {
-                flag1 = false;
+                badLevelCount++;
             }
+            i = j;
+            j++;
         }
 
-        for (int i = report.length - 1; i > 0; i--) {
-            int difference = report[i] - report[i - 1];
+        i = report.length - 1;
+        j = i - 1;
+        while (j >= 0) {
+            int difference = report[i] - report[j];
             if (difference < 1 || difference > 3) {
-                flag2 = false;
+                badLevelCountReverse++;
             }
-        }
-        if (flag1 || flag2) {
-            print(report);
+            i = j;
+            j--;
         }
 
-        return flag1 || flag2;
+        return badLevelCount == 0 || badLevelCountReverse == 0;
     }
 
     public static void print(Integer[] report) {
