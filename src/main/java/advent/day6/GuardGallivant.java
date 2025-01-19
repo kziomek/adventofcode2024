@@ -7,20 +7,50 @@ import java.nio.file.Path;
 public class GuardGallivant {
 
     public static void main(String[] args) throws IOException {
+
 //        char[][] grid = Files.readAllLines(Path.of("src/main/resources/day6/example.txt"))
-        char[][] grid = Files.readAllLines(Path.of("src/main/resources/day6/my-input.txt"))
+                    char[][] grid = Files.readAllLines(Path.of("src/main/resources/day6/my-input.txt"))
             .stream()
             .map(String::toCharArray)
             .toArray(char[][]::new);
 
         Position startPosition = findStartPosition(grid);
+
+        int obstacleCount = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid.length; j++) {
+                if (grid[i][j] == '#' || grid[i][j] == '^') {
+                    continue;
+                }
+                char[][] gridO = copyGrid(grid);
+                gridO[i][j] = 'O';
+
+                System.out.println("pos " + i + " " + j);
+                try {
+                    moveGuard(gridO, startPosition);
+                } catch (CycleException ce) {
+                    obstacleCount++;
+                }
+            }
+        }
+        System.out.println("Result part 2 " + obstacleCount);
+
         moveGuard(grid, startPosition);
 
-        printGrid(grid);
-        System.out.println(grid);
+        //        printGrid(grid);
 
         int countX = countX(grid);
         System.out.println("Result part 1 " + countX);
+    }
+
+    private static char[][] copyGrid(char[][] grid) {
+        char[][] copy = new char[grid.length][grid[0].length];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                copy[i][j] = grid[i][j];
+            }
+        }
+        return copy;
     }
 
     private static int countX(char[][] grid) {
@@ -49,13 +79,28 @@ public class GuardGallivant {
 
         Position move = new Position(-1, 0);
 
+        boolean isLoop = true;
+        int turnCounter = 0;
+
         do {
+            if (grid[i][j] != 'X') {
+                isLoop = false;
+            }
             grid[i][j] = 'X';
             if (canMoveStraight(i, j, move, grid)) {
                 i += move.i;
                 j += move.j;
             } else {
                 move = turn90(move);
+                if (isLoop) {
+                    turnCounter++;
+                    if (turnCounter == 4) {
+                        throw new CycleException();
+                    }
+                } else {
+                    turnCounter = 0;
+                    isLoop = true;
+                }
             }
         } while (guardInBoundries(i, j, grid));
     }
@@ -80,7 +125,7 @@ public class GuardGallivant {
         if (!guardInBoundries(i + move.i, j + move.j, grid)) {
             return true;
         }
-        return grid[i + move.i][j + move.j] != '#';
+        return grid[i + move.i][j + move.j] != '#' && grid[i + move.i][j + move.j] != 'O';
     }
 
     private static boolean guardInBoundries(int i, int j, char[][] grid) {
