@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +16,8 @@ public class PrintQueue {
 
     public static void main(String[] args) throws IOException {
 
-        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/example.txt"));
-//                        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/my-input.txt"));
+//        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/example.txt"));
+                        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/my-input.txt"));
         //        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/my-debug-input.txt"));
 
         Set<Integer> distinct = dist(lines);
@@ -37,31 +36,26 @@ public class PrintQueue {
 
         System.out.println("result " + sum);
 
-        pages.removeAll(correctlyOrderedManuals);
+        List<List<Integer>> unorderedManuals = new ArrayList<>(pages);
+        unorderedManuals.removeAll(correctlyOrderedManuals);
+        part2(unorderedManuals, graph);
+    }
 
-        System.out.println(pages);
-
+    private static void part2(List<List<Integer>> unorderedPages, Map<Integer, Set<Integer>> graph) throws UnexpectedException {
         List<List<Integer>> sorted = new ArrayList<>();
-
-        for (List<Integer> page : pages) {
+        for (List<Integer> page : unorderedPages) {
             List<Integer> modifiableList = new ArrayList<>(page);
             modifiableList.sort((o1, o2) -> {
-                Set<Integer> integers = graph.get(o1);
-                if (integers == null) {
-                    return 0;
-                }
-                if (integers.contains(o2)) {
-                    return -1;
-                }
+                Set<Integer> dependenciesO1 = graph.get(o1);
+                Set<Integer> dependenciesO2 = graph.get(o2);
 
-                Set<Integer> integers2 = graph.get(o2);
-                if (integers2 == null) {
-                    return 0;
+                if (dependenciesO1 != null && dependenciesO1.contains(o2)) {
+                    return -1; // o1 depends on o2, so o1 should come before o2
+                } else if (dependenciesO2 != null && dependenciesO2.contains(o1)) {
+                    return 1; // o2 depends on o1, so o2 should come before o1
+                } else {
+                    return 0; // No direct dependency, maintain current order
                 }
-                if (integers2.contains(o1)) {
-                    return 1;
-                }
-                return 0;
             });
             sorted.add(modifiableList);
             //            System.out.println(modifiableList);
