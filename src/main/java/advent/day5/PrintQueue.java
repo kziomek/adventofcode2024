@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,8 +17,8 @@ public class PrintQueue {
 
     public static void main(String[] args) throws IOException {
 
-//        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/example.txt"));
-                List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/my-input.txt"));
+        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/example.txt"));
+//                        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/my-input.txt"));
         //        List<String> lines = Files.readAllLines(Path.of("src/main/resources/day5/my-debug-input.txt"));
 
         Set<Integer> distinct = dist(lines);
@@ -25,7 +26,6 @@ public class PrintQueue {
         List<List<Integer>> pages = getPages(lines);
 
         List<List<Integer>> correctlyOrderedManuals = filterCorrectlyOrderedManuals2(pages, graph);
-
 
         int sum = 0;
         for (List<Integer> correctlyOrderedManual : correctlyOrderedManuals) {
@@ -36,6 +36,48 @@ public class PrintQueue {
         }
 
         System.out.println("result " + sum);
+
+        pages.removeAll(correctlyOrderedManuals);
+
+        System.out.println(pages);
+
+        List<List<Integer>> sorted = new ArrayList<>();
+
+        for (List<Integer> page : pages) {
+            List<Integer> modifiableList = new ArrayList<>(page);
+            modifiableList.sort((o1, o2) -> {
+                Set<Integer> integers = graph.get(o1);
+                if (integers == null) {
+                    return 0;
+                }
+                if (integers.contains(o2)) {
+                    return -1;
+                }
+
+                Set<Integer> integers2 = graph.get(o2);
+                if (integers2 == null) {
+                    return 0;
+                }
+                if (integers2.contains(o1)) {
+                    return 1;
+                }
+                return 0;
+            });
+            sorted.add(modifiableList);
+            //            System.out.println(modifiableList);
+        }
+
+        System.out.println("Sorted: ");
+        System.out.println(sorted);
+
+        int sortedSum = 0;
+        for (List<Integer> correctlyOrderedManual : sorted) {
+            if (correctlyOrderedManual.size() % 2 == 0) {
+                throw new UnexpectedException("not expected even number of elements");
+            }
+            sortedSum += correctlyOrderedManual.get(correctlyOrderedManual.size() / 2);
+        }
+        System.out.println("Sorted sum " + sortedSum);
     }
 
     private static List<List<Integer>> filterCorrectlyOrderedManuals2(List<List<Integer>> pages, Map<Integer, Set<Integer>> graph) {
@@ -48,7 +90,7 @@ public class PrintQueue {
                     break;
                 }
                 for (int j = i + 1; j < page.size(); j++) {
-                    if (graph.get(page.get(j)) != null && graph.get(page.get(j)).contains(page.get(i))){
+                    if (graph.get(page.get(j)) != null && graph.get(page.get(j)).contains(page.get(i))) {
                         ordered = false;
                         break;
                     }
@@ -57,7 +99,6 @@ public class PrintQueue {
             if (ordered) {
                 correctlyOrderedManuals.add(page);
             }
-
         }
         return correctlyOrderedManuals;
     }
