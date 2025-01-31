@@ -38,7 +38,8 @@ public class BridgeRepair {
     private static boolean isValidCalibration(Calibration calibration, BigInteger currValue, int i) {
 
         return isValidCalibration(calibration, currValue, i, '*')
-            || isValidCalibration(calibration, currValue, i, '+');
+            || isValidCalibration(calibration, currValue, i, '+')
+            || isValidCalibration(calibration, currValue, i, '|');
     }
 
     private static boolean isValidCalibration(Calibration calibration, BigInteger currValue, int i, char op) {
@@ -51,7 +52,12 @@ public class BridgeRepair {
         if (op == '+') {
             currValue = currValue.add(calibration.numbers.get(i));
         }
+        if (op == '|') {
+            BigInteger multiply = new BigInteger("10").pow(calibration.numbers.get(i).toString().length());
+            currValue = currValue.multiply(multiply).add(calibration.numbers.get(i));
+        }
         return isValidCalibration(calibration, currValue, i + 1, '*')
-            || isValidCalibration(calibration, currValue, i + 1, '+');
+            || isValidCalibration(calibration, currValue, i + 1, '+')
+            || isValidCalibration(calibration, currValue, i + 1, '|');
     }
 }
