@@ -1,4 +1,4 @@
-package advent.day8;
+package advent.day9;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,7 +8,7 @@ public class DiskFragmenter {
 
     public static void main(String[] args) throws IOException {
 //        String input = Files.readAllLines(Path.of("src/main/resources/day8/example.txt")).get(0);
-                        String input = Files.readAllLines(Path.of("src/main/resources/day8/my-input.txt")).get(0);
+                        String input = Files.readAllLines(Path.of("src/main/resources/day9/my-input.txt")).get(0);
         System.out.println(input);
 
         int[] arr = decompressInput(input);
