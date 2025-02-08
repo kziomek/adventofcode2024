@@ -15,7 +15,7 @@ public class ResonantCollinearity {
 
     public static void main(String[] args) throws IOException {
 
-        //                char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/example.txt"))
+        //            char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/example.txt"))
         char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/my-input.txt"))
             //        char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/t-example.txt"))
             .stream().map(String::toCharArray)
@@ -58,13 +58,44 @@ public class ResonantCollinearity {
         Set<Antinode> antinodesByFrequency = new HashSet<>();
         for (int i = 0; i < antennas.size() - 1; i++) {
             for (int j = 1; j < antennas.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
                 Antenna a = antennas.get(i);
                 Antenna b = antennas.get(j);
-                Set<Antinode> antinodes = calculateAntinodes(a, b, maxI, maxJ);
+                Set<Antinode> antinodes = calculateAntinodesPart2(a, b, maxI, maxJ);
                 antinodesByFrequency.addAll(antinodes);
             }
         }
         return antinodesByFrequency;
+    }
+
+    private static Set<Antinode> calculateAntinodesPart2(Antenna a, Antenna b, int maxI, int maxJ) {
+        System.out.println("Calculate antinodes for antennas: ");
+        System.out.println(a);
+        System.out.println(b);
+
+        Set<Antinode> antinodes = new HashSet<>();
+        int distanceJ = b.j - a.j;
+        int distanceI = b.i - a.i;
+
+        addInLine(antinodes, a.i, a.j, distanceI, distanceJ, maxI, maxJ);
+        addInLine(antinodes, a.i, a.j, -1 * distanceI, -1 * distanceJ, maxI, maxJ);
+
+        System.out.println(antinodes);
+
+        return antinodes;
+    }
+
+    private static void addInLine(Set<Antinode> antinodes, int i, int j, int distanceI, int distanceJ, int maxI, int maxJ) {
+        int currentI = i;
+        int currentJ = j;
+
+        while (currentI >= 0 && currentI <= maxI && currentJ >= 0 && currentJ <= maxJ) {
+            antinodes.add(new Antinode(currentI, currentJ));
+            currentI += distanceI;
+            currentJ += distanceJ;
+        }
     }
 
     private static Set<Antinode> calculateAntinodes(Antenna a, Antenna b, int maxI, int maxJ) {
