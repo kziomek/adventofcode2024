@@ -16,17 +16,17 @@ public class HoofIt {
         // collect coordinates of 9 and add to set for
 
         //        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/example-1.txt")).stream()
-//        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/example.txt")).stream()
-                    Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/my-input.txt")).stream()
+        //        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/example.txt")).stream()
+        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/my-input.txt")).stream()
             .map(line -> Arrays.stream(line.split(""))
                 .map(Integer::valueOf)
                 .toArray(Integer[]::new)
             ).toArray(Integer[][]::new);
         Set<Coordinates> trailheads = collectTrailheads(grid);
-                System.out.println(trailheads);
-                int result = part1(trailheads, grid);
+        System.out.println(trailheads);
+        int result = part1(trailheads, grid);
         int result2 = part2(trailheads, grid);
-                System.out.println("Part 1 : " + result);
+        System.out.println("Part 1 : " + result);
         System.out.println("Part 2 : " + result2);
     }
 
@@ -69,22 +69,15 @@ public class HoofIt {
         int height = grid[i][j];
         int nextHeight = height + 1;
         int split = -1;
-        if (canMove(grid, nextHeight, i + 1, j)) {
-            rating += traverseGrid(i + 1, j, grid, peaks);
-            split += 1;
+
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int[] direction : directions) {
+            if (canMove(grid, nextHeight, i + direction[0], j + direction[1])) {
+                rating += traverseGrid(i + direction[0], j + direction[1], grid, peaks);
+                split += 1;
+            }
         }
-        if (canMove(grid, nextHeight, i - 1, j)) {
-            rating += traverseGrid(i - 1, j, grid, peaks);
-            split += 1;
-        }
-        if (canMove(grid, nextHeight, i, j + 1)) {
-            rating += traverseGrid(i, j + 1, grid, peaks);
-            split += 1;
-        }
-        if (canMove(grid, nextHeight, i, j - 1)) {
-            rating += traverseGrid(i, j - 1, grid, peaks);
-            split += 1;
-        }
+
         return rating + split;
     }
 
