@@ -15,17 +15,19 @@ public class HoofIt {
         // traverse recursivelly from 0 and split where more than one path
         // collect coordinates of 9 and add to set for
 
-//        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/example-1.txt")).stream()
+        //        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/example-1.txt")).stream()
 //        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/example.txt")).stream()
-        Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/my-input.txt")).stream()
+                    Integer[][] grid = Files.readAllLines(Path.of("src/main/resources/day10/my-input.txt")).stream()
             .map(line -> Arrays.stream(line.split(""))
                 .map(Integer::valueOf)
                 .toArray(Integer[]::new)
             ).toArray(Integer[][]::new);
         Set<Coordinates> trailheads = collectTrailheads(grid);
-//        System.out.println(trailheads);
-        int result = part1(trailheads, grid);
-        System.out.println("Part 1 : " + result);
+                System.out.println(trailheads);
+                int result = part1(trailheads, grid);
+        int result2 = part2(trailheads, grid);
+                System.out.println("Part 1 : " + result);
+        System.out.println("Part 2 : " + result2);
     }
 
     private static int part1(Set<Coordinates> trailheads, Integer[][] grid) {
@@ -37,35 +39,53 @@ public class HoofIt {
         return count;
     }
 
+    private static int part2(Set<Coordinates> trailheads, Integer[][] grid) {
+        int count = 0;
+        for (Coordinates trailhead : trailheads) {
+            int rating = countRating(trailhead, grid);
+            count += rating;
+        }
+
+        return count;
+    }
+
+    private static int countRating(Coordinates trailhead, Integer[][] grid) {
+        Set<Coordinates> peaks = new HashSet<>();
+        return 1 + traverseGrid(trailhead.i, trailhead.j, grid, peaks);
+    }
+
     private static int countScore(Coordinates trailhead, Integer[][] grid) {
         Set<Coordinates> peaks = new HashSet<>();
         traverseGrid(trailhead.i, trailhead.j, grid, peaks);
-        System.out.println("Trailhead");
-        System.out.println(trailhead);
-        System.out.println("Peaks");
-        System.out.println(peaks);
         return peaks.size();
     }
 
-    private static void traverseGrid(int i, int j, Integer[][] grid, Set<Coordinates> peaks) {
+    private static int traverseGrid(int i, int j, Integer[][] grid, Set<Coordinates> peaks) {
+        int rating = 0;
         if (grid[i][j] == 9) {
             peaks.add(new Coordinates(i, j));
-            return;
+            return 0;
         }
         int height = grid[i][j];
         int nextHeight = height + 1;
+        int split = -1;
         if (canMove(grid, nextHeight, i + 1, j)) {
-            traverseGrid(i + 1, j, grid, peaks);
+            rating += traverseGrid(i + 1, j, grid, peaks);
+            split += 1;
         }
         if (canMove(grid, nextHeight, i - 1, j)) {
-            traverseGrid(i - 1, j, grid, peaks);
+            rating += traverseGrid(i - 1, j, grid, peaks);
+            split += 1;
         }
         if (canMove(grid, nextHeight, i, j + 1)) {
-            traverseGrid(i, j + 1, grid, peaks);
+            rating += traverseGrid(i, j + 1, grid, peaks);
+            split += 1;
         }
         if (canMove(grid, nextHeight, i, j - 1)) {
-            traverseGrid(i, j - 1, grid, peaks);
+            rating += traverseGrid(i, j - 1, grid, peaks);
+            split += 1;
         }
+        return rating + split;
     }
 
     private static boolean canMove(Integer[][] grid, int nextHeight, int i, int j) {
