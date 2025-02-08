@@ -15,8 +15,9 @@ public class ResonantCollinearity {
 
     public static void main(String[] args) throws IOException {
 
-//        char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/example.txt"))
+        //                char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/example.txt"))
         char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/my-input.txt"))
+            //        char[][] inputGrid = Files.readAllLines(Path.of("src/main/resources/day8/t-example.txt"))
             .stream().map(String::toCharArray)
             .toArray(char[][]::new);
 
@@ -26,8 +27,11 @@ public class ResonantCollinearity {
         Map<Character, List<Antenna>> map = toMap(antennaSet);
         System.out.println(map);
 
-        Set<Antinode> antinodes = calculateAntinodes(map);
-        antinodes = filterByGridBoundries(antinodes, inputGrid.length, inputGrid[0].length);
+        Set<Antinode> antinodes = calculateAntinodes(map, inputGrid.length - 1, inputGrid[0].length - 1);
+        //        Set<Antinode> filteredAntinodes = filterByGridBoundries(antinodes, inputGrid.length, inputGrid[0].length);
+        //        antinodes.removeAll(filteredAntinodes);
+        //        System.out.println("Filtered");
+        System.out.println(antinodes);
 
         System.out.println("Result part 1: " + antinodes.size());
     }
@@ -39,31 +43,31 @@ public class ResonantCollinearity {
             .collect(Collectors.toSet());
     }
 
-    private static Set<Antinode> calculateAntinodes(Map<Character, List<Antenna>> map) {
+    private static Set<Antinode> calculateAntinodes(Map<Character, List<Antenna>> map, int maxI, int maxJ) {
         Set<Antinode> allAntinodes = new HashSet<>();
         for (Character frequency : map.keySet()) {
             List<Antenna> antennas = map.get(frequency);
-            Set<Antinode> antinodes = calculateAntinodes(antennas);
+            Set<Antinode> antinodes = calculateAntinodes(antennas, maxI, maxJ);
             allAntinodes.addAll(antinodes);
         }
 
         return allAntinodes;
     }
 
-    private static Set<Antinode> calculateAntinodes(List<Antenna> antennas) {
+    private static Set<Antinode> calculateAntinodes(List<Antenna> antennas, int maxI, int maxJ) {
         Set<Antinode> antinodesByFrequency = new HashSet<>();
         for (int i = 0; i < antennas.size() - 1; i++) {
             for (int j = 1; j < antennas.size(); j++) {
                 Antenna a = antennas.get(i);
                 Antenna b = antennas.get(j);
-                Set<Antinode> antinodes = calculateAntinodes(a, b);
+                Set<Antinode> antinodes = calculateAntinodes(a, b, maxI, maxJ);
                 antinodesByFrequency.addAll(antinodes);
             }
         }
         return antinodesByFrequency;
     }
 
-    private static Set<Antinode> calculateAntinodes(Antenna a, Antenna b) {
+    private static Set<Antinode> calculateAntinodes(Antenna a, Antenna b, int maxI, int maxJ) {
         System.out.println("Calculate antinodes for antennas: ");
         System.out.println(a);
         System.out.println(b);
@@ -78,21 +82,37 @@ public class ResonantCollinearity {
 
         // 2 external points
         if (a.i + distanceI != b.i) {
-            antinodes.add(new Antinode(a.i + distanceI, a.j + distanceJ));
+            Antinode antinode = new Antinode(a.i + distanceI, a.j + distanceJ);
+            if (inGrid(antinode, maxI, maxJ)) {
+                antinodes.add(antinode);
+            }
         }
         if (a.i - distanceI != b.i) {
-            antinodes.add(new Antinode(a.i - distanceI, a.j - distanceJ));
+            Antinode antinode = new Antinode(a.i - distanceI, a.j - distanceJ);
+            if (inGrid(antinode, maxI, maxJ)) {
+                antinodes.add(antinode);
+            }
         }
         if (b.i + distanceI != a.i) {
-            antinodes.add(new Antinode(b.i + distanceI, b.j + distanceJ));
+            Antinode antinode = new Antinode(b.i + distanceI, b.j + distanceJ);
+            if (inGrid(antinode, maxI, maxJ)) {
+                antinodes.add(antinode);
+            }
         }
         if (b.i - distanceI != a.i) {
-            antinodes.add(new Antinode(b.i - distanceI, b.j - distanceJ));
+            Antinode antinode = new Antinode(b.i - distanceI, b.j - distanceJ);
+            if (inGrid(antinode, maxI, maxJ)) {
+                antinodes.add(antinode);
+            }
         }
 
         System.out.println(antinodes);
 
         return antinodes;
+    }
+
+    private static boolean inGrid(Antinode antinode, int maxI, int maxJ) {
+        return antinode.i >= 0 && antinode.i <= maxI && antinode.j >= 0 && antinode.j <= maxJ;
     }
 
     private static Map<Character, List<Antenna>> toMap(Set<Antenna> antennaSet) {
