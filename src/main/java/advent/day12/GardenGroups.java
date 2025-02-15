@@ -116,7 +116,7 @@ public class GardenGroups {
         return sides;
     }
 
-    // T
+    // TODO consider on which side is plant when burning side
     private static void burnSide(Coordinates sideCoordinates, char[][] expanded, char plant, Set<Coordinates> visited) {
         visited.add(sideCoordinates);
         if (isVertical(sideCoordinates, expanded)) {
