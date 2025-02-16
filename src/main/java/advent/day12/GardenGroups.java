@@ -81,10 +81,10 @@ public class GardenGroups {
         for (int i = 0; i < expanded.length; i++) {
             for (int j = 0; j < expanded[0].length; j++) {
                 if (expanded[i][j] == '.') {
-                    Coordinates sideCoordinates = new Coordinates(i, j);
-                    if (!visited.contains(sideCoordinates)) {
+                    Coordinates startSideCoordinates = new Coordinates(i, j);
+                    if (!visited.contains(startSideCoordinates)) {
                         sides++;
-                        burnSide(sideCoordinates, expanded, plant, visited);
+                        burnSide(startSideCoordinates, expanded, plant, visited);
                     }
                 }
             }
@@ -102,22 +102,11 @@ public class GardenGroups {
         }
     }
 
-    private static void burnVerticalSide(Coordinates sideCoordinates, char[][] expanded, Set<Coordinates> visited, char plant) {
-        Coordinates adjecentPlant = adjacentPlantCoordinatesForVerticalSide(sideCoordinates, expanded, plant);
-        // burn up
-        int startI = sideCoordinates.i;
-        int startJ = sideCoordinates.j;
+    private static void burnVerticalSide(Coordinates startSideCoordinates, char[][] expanded, Set<Coordinates> visited, char plant) {
+        Coordinates adjecentPlant = adjacentPlantCoordinatesForVerticalSide(startSideCoordinates, expanded, plant);
 
-        //burn up
-        Coordinates coordinates = new Coordinates(startI - 2, startJ);
-        adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
-        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
-            visited.add(coordinates);
-            coordinates = new Coordinates(coordinates.i - 2, coordinates.j);
-            adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
-        }
         // burn down
-        coordinates = new Coordinates(startI + 2, startJ);
+        Coordinates coordinates = new Coordinates(startSideCoordinates.i + 2, startSideCoordinates.j);
         adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
         while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
             visited.add(coordinates);
@@ -161,22 +150,10 @@ public class GardenGroups {
         return expanded[coordinates.i][coordinates.j] == plant;
     }
 
-    private static void burnHorizontalSide(Coordinates sideCoordinates, char[][] expanded, Set<Coordinates> visited, char plant) {
-        Coordinates adjecentPlant = adjacentPlantCoordinatesForHorizontalSide(sideCoordinates, expanded, plant);
-        // burn up
-        int startI = sideCoordinates.i;
-        int startJ = sideCoordinates.j;
-
-        //burn left
-        Coordinates coordinates = new Coordinates(startI, startJ - 2);
-        adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
-        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
-            visited.add(coordinates);
-            coordinates = new Coordinates(coordinates.i, coordinates.j - 2);
-            adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
-        }
-        // burn right
-        coordinates = new Coordinates(startI, startJ + 2);
+    private static void burnHorizontalSide(Coordinates startSideCoordinates, char[][] expanded, Set<Coordinates> visited, char plant) {
+        Coordinates adjecentPlant = adjacentPlantCoordinatesForHorizontalSide(startSideCoordinates, expanded, plant);
+        // burn towards right
+        Coordinates coordinates = new Coordinates(startSideCoordinates.i, startSideCoordinates.j + 2);
         adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
         while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
             visited.add(coordinates);
