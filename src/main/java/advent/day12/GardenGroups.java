@@ -16,18 +16,19 @@ public class GardenGroups {
 
     public static void main(String[] args) throws IOException {
 
-//        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example1.txt"))
-            //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example2.txt"))
-            //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example3.txt"))
+        //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example1.txt"))
+        //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example2.txt"))
+        //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example3.txt"))
 
-//                    char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-1.txt"))
-//                    char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-2.txt"))
-                    char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-3.txt"))
-            //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/my-example.txt"))
+//                char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-1.txt"))
+//        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-2.txt"))
+//                                char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-3.txt"))
+//                                char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-4.txt"))
+                    char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/my-example.txt"))
             .stream().map(String::toCharArray).toArray(char[][]::new);
 
         List<Map<Character, Set<Coordinates>>> groups = buildGroups(gardenGrid);
-        int total = 0;
+        int totalWithSides = 0;
         for (Map<Character, Set<Coordinates>> group : groups) {
             for (Map.Entry<Character, Set<Coordinates>> entry : group.entrySet()) {
                 char plant = entry.getKey();
@@ -41,7 +42,7 @@ public class GardenGroups {
 
                 //                System.out.println("group " + plant + " " + area + " " + perimeter);
                 System.out.println("group " + plant + " " + area + " " + sides);
-                total += area * sides;
+                totalWithSides += area * sides;
             }
 
             System.out.println();
@@ -58,7 +59,7 @@ public class GardenGroups {
         //        System.out.println(areas);
         //
         //        int part1Result = part1(areas, gardenGrid);
-        System.out.println("Part 1 result " + total);
+        System.out.println("Part 2 result " + totalWithSides);
     }
 
     private static int calculateSides(Set<Coordinates> plants, char plant, int i, int j) {
@@ -67,9 +68,9 @@ public class GardenGroups {
             grid[p.i][p.j] = plant;
         }
 
-        print(grid);
+//        print(grid);
         char[][] expandedGrid = expand(grid);
-        print(expandedGrid);
+//        print(expandedGrid);
         return calculateSides(plant, expandedGrid);
     }
 
@@ -83,7 +84,7 @@ public class GardenGroups {
                 }
             }
         }
-        print(expanded);
+//        print(expanded);
 
         int sidesCount = countSides(plant, expanded);
         //        for (char[] chars : expanded) {
@@ -117,12 +118,13 @@ public class GardenGroups {
     }
 
     // TODO consider on which side is plant when burning side
+    // find direction of adjusting plant
     private static void burnSide(Coordinates sideCoordinates, char[][] expanded, char plant, Set<Coordinates> visited) {
         visited.add(sideCoordinates);
-        if (isVertical(sideCoordinates, expanded)) {
+        if (isVertical(sideCoordinates, expanded, plant)) {
             burnVerticalSide(sideCoordinates, expanded, visited, plant);
         }
-        if (isHorizontal(sideCoordinates, expanded)) {
+        if (isHorizontal(sideCoordinates, expanded, plant)) {
             burnHorizontalSide(sideCoordinates, expanded, visited, plant);
         }
         //it is dot size;
@@ -130,6 +132,9 @@ public class GardenGroups {
     }
 
     private static void burnVerticalSide(Coordinates sideCoordinates, char[][] expanded, Set<Coordinates> visited, char plant) {
+
+        Coordinates adjecentPlant = adjacentPlantCoordinatesForVerticalSide(sideCoordinates, expanded, plant);
+
         // burn up
         int startI = sideCoordinates.i;
         int startJ = sideCoordinates.j;
@@ -137,26 +142,72 @@ public class GardenGroups {
         int i = startI - 2;
         //burn up
         Coordinates coordinates = new Coordinates(i, startJ);
+        adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
         while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
             if (expanded[coordinates.i + 1][coordinates.j] == plant) {
                 break;
             }
+            if (!isPlant(adjecentPlant, expanded, plant)) {
+                break;
+            }
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i - 2, coordinates.j);
+            adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
         }
         // burn down
         i = startI + 2;
         coordinates = new Coordinates(i, startJ);
+        adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
         while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
             if (expanded[coordinates.i - 1][coordinates.j] == plant) {
                 break;
             }
+            if (!isPlant(adjecentPlant, expanded, plant)) {
+                break;
+            }
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i + 2, coordinates.j);
+            adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
         }
     }
 
+    private static Coordinates adjacentPlantCoordinatesForVerticalSide(Coordinates sideCoordinates, char[][] expanded, char plant) {
+        Coordinates leftToPerimeter = new Coordinates(sideCoordinates.i, sideCoordinates.j - 1);
+        if (isPlant(leftToPerimeter, expanded, plant)) {
+            return leftToPerimeter;
+        }
+
+        Coordinates rightToPerimeter = new Coordinates(sideCoordinates.i, sideCoordinates.j + 1);
+        if (isPlant(rightToPerimeter, expanded, plant)) {
+            return rightToPerimeter;
+        }
+
+        throw new IllegalStateException("expected plant not found");
+    }
+
+    private static Coordinates adjacentPlantCoordinatesForHorizontalSide(Coordinates sideCoordinates, char[][] expanded, char plant) {
+        Coordinates upToPerimeter = new Coordinates(sideCoordinates.i - 1, sideCoordinates.j);
+        if (isPlant(upToPerimeter, expanded, plant)) {
+            return upToPerimeter;
+        }
+
+        Coordinates downToPerimeter = new Coordinates(sideCoordinates.i + 1, sideCoordinates.j);
+        if (isPlant(downToPerimeter, expanded, plant)) {
+            return downToPerimeter;
+        }
+
+        throw new IllegalStateException("expected plant not found");
+    }
+
+    private static boolean isPlant(Coordinates coordinates, char[][] expanded, char plant) {
+        if (!inGrid(coordinates, expanded)) {
+            return false;
+        }
+        return expanded[coordinates.i][coordinates.j] == plant;
+    }
+
     private static void burnHorizontalSide(Coordinates sideCoordinates, char[][] expanded, Set<Coordinates> visited, char plant) {
+        Coordinates adjecentPlant = adjacentPlantCoordinatesForHorizontalSide(sideCoordinates, expanded, plant);
         // burn up
         int startI = sideCoordinates.i;
         int startJ = sideCoordinates.j;
@@ -164,51 +215,71 @@ public class GardenGroups {
         int j = startJ - 2;
         //burn left
         Coordinates coordinates = new Coordinates(startI, j);
+        adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
         while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
             if (expanded[coordinates.i][coordinates.j + 1] == plant) {
                 break;
             }
+            if (!isPlant(adjecentPlant, expanded, plant)) {
+                break;
+            }
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i, coordinates.j - 2);
+            adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
         }
         // burn right
         j = startJ + 2;
         coordinates = new Coordinates(startI, j);
+        adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
         while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
             if (expanded[coordinates.i][coordinates.j - 1] == plant) {
                 break;
             }
+            if (!isPlant(adjecentPlant, expanded, plant)) {
+                break;
+            }
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i, coordinates.j + 2);
+            adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
         }
     }
 
-    private static boolean isVertical(Coordinates sideCoordinates, char[][] expanded) {
-        Coordinates up = new Coordinates(sideCoordinates.i - 2, sideCoordinates.j);
-        if (inGrid(up, expanded) && isDot(up, expanded)) {
-            return true;
-        }
-        Coordinates down = new Coordinates(sideCoordinates.i + 2, sideCoordinates.j);
-        if (inGrid(down, expanded) && expanded[down.i][down.j] == '.') {
-            return true;
-        }
-        return false;
+    private static boolean isVertical(Coordinates sideCoordinates, char[][] expanded, char plant) {
+        // if up or down is plant
+        Coordinates left = new Coordinates(sideCoordinates.i, sideCoordinates.j-1);
+        Coordinates right = new Coordinates(sideCoordinates.i , sideCoordinates.j+1);
+        return isPlant(left, expanded, plant) || isPlant(right, expanded, plant);
+
+        //        Coordinates up = new Coordinates(sideCoordinates.i - 2, sideCoordinates.j);
+        //        if (inGrid(up, expanded) && isDot(up, expanded) && !isPlant(new Coordinates(sideCoordinates.i - 1, sideCoordinates.j), expanded, plant)) {
+        //            return true;
+        //        }
+        //        Coordinates down = new Coordinates(sideCoordinates.i + 2, sideCoordinates.j);
+        //        if (inGrid(down, expanded) && isDot(down, expanded) && !isPlant(new Coordinates(sideCoordinates.i + 1, sideCoordinates.j), expanded, plant)) {
+        //            return true;
+        //        }
+        //        return false;
     }
 
     private static boolean isDot(Coordinates up, char[][] expanded) {
         return expanded[up.i][up.j] == '.';
     }
 
-    private static boolean isHorizontal(Coordinates sideCoordinates, char[][] expanded) {
-        Coordinates left = new Coordinates(sideCoordinates.i, sideCoordinates.j - 2);
-        if (inGrid(left, expanded) && expanded[left.i][left.j] == '.') {
-            return true;
-        }
-        Coordinates right = new Coordinates(sideCoordinates.i, sideCoordinates.j + 2);
-        if (inGrid(right, expanded) && expanded[right.i][right.j] == '.') {
-            return true;
-        }
-        return false;
+    private static boolean isHorizontal(Coordinates sideCoordinates, char[][] expanded, char plant) {
+
+        Coordinates up = new Coordinates(sideCoordinates.i - 1, sideCoordinates.j);
+        Coordinates down = new Coordinates(sideCoordinates.i + 1, sideCoordinates.j);
+        return isPlant(up, expanded, plant) || isPlant(down, expanded, plant);
+        //
+        //        Coordinates left = new Coordinates(sideCoordinates.i, sideCoordinates.j - 2);
+        //        if (inGrid(left, expanded) && isDot(left, expanded) && !isPlant(new Coordinates(sideCoordinates.i, sideCoordinates.j - 1), expanded, plant)) {
+        //            return true;
+        //        }
+        //        Coordinates right = new Coordinates(sideCoordinates.i, sideCoordinates.j + 2);
+        //        if (inGrid(right, expanded) && isDot(right, expanded) && !isPlant(new Coordinates(sideCoordinates.i, sideCoordinates.j + 1), expanded, plant)) {
+        //            return true;
+        //        }
+        //        return false;
     }
 
     private static boolean inGrid(Coordinates coordinates, char[][] expanded) {
