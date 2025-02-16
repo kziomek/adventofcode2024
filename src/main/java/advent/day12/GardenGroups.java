@@ -22,9 +22,9 @@ public class GardenGroups {
 
         //                        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-1.txt"))
         //                char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-2.txt"))
-//        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-3.txt"))
-            //                                char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-4.txt"))
-                    char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/my-example.txt"))
+        //        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-3.txt"))
+        //                                char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/example-part2-4.txt"))
+        char[][] gardenGrid = Files.readAllLines(Path.of("src/main/resources/day12/my-example.txt"))
             .stream().map(String::toCharArray).toArray(char[][]::new);
 
         List<Map<Character, Set<Coordinates>>> groups = buildGroups(gardenGrid);
@@ -108,26 +108,18 @@ public class GardenGroups {
         int startI = sideCoordinates.i;
         int startJ = sideCoordinates.j;
 
-        int i = startI - 2;
         //burn up
-        Coordinates coordinates = new Coordinates(i, startJ);
+        Coordinates coordinates = new Coordinates(startI - 2, startJ);
         adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
-        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
-            if (!isPlant(adjecentPlant, expanded, plant)) { // adjacent plant not present
-                break;
-            }
+        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i - 2, coordinates.j);
             adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
         }
         // burn down
-        i = startI + 2;
-        coordinates = new Coordinates(i, startJ);
+        coordinates = new Coordinates(startI + 2, startJ);
         adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
-        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
-            if (!isPlant(adjecentPlant, expanded, plant)) {
-                break;
-            }
+        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i + 2, coordinates.j);
             adjecentPlant = new Coordinates(coordinates.i, adjecentPlant.j);
@@ -175,26 +167,18 @@ public class GardenGroups {
         int startI = sideCoordinates.i;
         int startJ = sideCoordinates.j;
 
-        int j = startJ - 2;
         //burn left
-        Coordinates coordinates = new Coordinates(startI, j);
+        Coordinates coordinates = new Coordinates(startI, startJ - 2);
         adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
-        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
-            if (!isPlant(adjecentPlant, expanded, plant)) {
-                break;
-            }
+        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i, coordinates.j - 2);
             adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
         }
         // burn right
-        j = startJ + 2;
-        coordinates = new Coordinates(startI, j);
+        coordinates = new Coordinates(startI, startJ + 2);
         adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
-        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded)) {
-            if (!isPlant(adjecentPlant, expanded, plant)) {
-                break;
-            }
+        while (inGrid(coordinates, expanded) && isDot(coordinates, expanded) && isPlant(adjecentPlant, expanded, plant)) {
             visited.add(coordinates);
             coordinates = new Coordinates(coordinates.i, coordinates.j + 2);
             adjecentPlant = new Coordinates(adjecentPlant.i, coordinates.j);
