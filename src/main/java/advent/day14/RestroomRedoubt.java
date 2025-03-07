@@ -8,13 +8,14 @@ import java.util.List;
 public class RestroomRedoubt {
 
     public static void main(String[] args) throws IOException {
-        List<Robot> robots = Files.readAllLines(Path.of("src/main/resources/day14/example.txt"))
+//        List<Robot> robots = Files.readAllLines(Path.of("src/main/resources/day14/example.txt"))
+        List<Robot> robots = Files.readAllLines(Path.of("src/main/resources/day14/my-input.txt"))
             .stream()
             .map(Robot::parse)
             .toList();
 
-        int xBoundry = 11;
-        int yBoundry = 7;
+        int xBoundry = 101;
+        int yBoundry = 103;
         int moves = 100;
 
         int[][] posCount = posCount(yBoundry, xBoundry);
