@@ -94,21 +94,6 @@ public class Warehouse {
         return grid[pos[0]][pos[1]] == '.';
     }
 
-    //    private boolean canMove(int[] direction) {
-    //        int[] pos = new int[] {robotPosition[0] + direction[0], robotPosition[1] + direction[1]};
-    //        while (isInGrid(pos)) {
-    //            if (grid[pos[0]][pos[1]] == '#') {
-    //                break;
-    //            }
-    //            if (grid[pos[0]][pos[1]] == '.') {
-    //                return true;
-    //            }
-    //            pos[0] = pos[0] + direction[0];
-    //            pos[1] = pos[1] + direction[1];
-    //        }
-    //        return false;
-    //    }
-
     private int[] findEmptyPos(int[] direction) {
         int[] pos = new int[] {robotPosition[0] + direction[0], robotPosition[1] + direction[1]};
         while (isInGrid(pos)) {
